@@ -23,9 +23,13 @@ module.exports = (app) => {
           userName,
           password: hashedPassword,
         });
+        if (newUser) {
+          const { userName, id } = newUser.dataValues;
+          const token = jwt.sign({ id, userName }, JWT_KEY, JWT_OPTIONS);
+          return res.status(200).json({ token });
+        }
 
-        const token = jwt.sign({ userName }, JWT_KEY, JWT_OPTIONS);
-        return res.status(200).json({ token });
+        return res.status(400).send("Error during registration");
       } catch (error) {
         console.error(error);
         const { name, message } = error;
@@ -63,8 +67,8 @@ module.exports = (app) => {
         if (!isCorrectPassword) {
           return res.status(400).end("Wrong user name or password");
         }
-
-        const token = jwt.sign({ userName }, JWT_KEY, JWT_OPTIONS);
+        const { id } = user.dataValues;
+        const token = jwt.sign({ id, userName }, JWT_KEY, JWT_OPTIONS);
         return res.status(200).json({ token });
       } catch (error) {
         console.error(error);

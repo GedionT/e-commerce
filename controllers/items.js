@@ -4,8 +4,10 @@ const { validationResult, check } = require("express-validator");
 
 const { pageLimit: limit } = require("../config/app.config");
 
+const authentication = require("../utils/authentication");
+
 module.exports = (app) => {
-  app.get("/api/item/:id", async (req, res) => {
+  app.get("/api/item/:id", authentication, async (req, res) => {
     try {
       const { id } = req.params;
       const item = await models.Item.findByPk(id);
@@ -17,7 +19,7 @@ module.exports = (app) => {
     }
   });
 
-  app.get("/api/items/:pageNo/:orderBy", async (req, res) => {
+  app.get("/api/items/:pageNo/:orderBy", authentication, async (req, res) => {
     try {
       let { pageNo, orderBy } = req.params;
       if (!pageNo || !Number(pageNo)) pageNo = 1;
@@ -43,7 +45,7 @@ module.exports = (app) => {
     }
   });
 
-  app.get("/api/items/:pageNo?", async (req, res) => {
+  app.get("/api/items/:pageNo?", authentication, async (req, res) => {
     try {
       let { pageNo } = req.params;
       if (!pageNo || !Number(pageNo)) pageNo = 1;
@@ -66,6 +68,7 @@ module.exports = (app) => {
 
   app.post(
     "/api/items",
+    authentication,
     [
       check("name").exists().isString(),
       check("price").exists().isNumeric(),
@@ -108,6 +111,7 @@ module.exports = (app) => {
 
   app.patch(
     "/api/items",
+    authentication,
     [
       check("id").isNumeric(),
       check("name").optional().isString(),
@@ -157,7 +161,7 @@ module.exports = (app) => {
     }
   );
 
-  app.delete("/api/items/:id", async (req, res) => {
+  app.delete("/api/items/:id", authentication, async (req, res) => {
     try {
       let { id } = req.params;
       id = Number(id);
